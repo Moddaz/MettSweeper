@@ -3,6 +3,12 @@
 
 class Game {
 
+    /**
+     * creates new game
+     * @param height height of gameboard
+     * @param width width of gameboard
+     * @param mines amount of mines
+     */
     constructor(height, width, mines) {
 
         this.fields = [];
@@ -12,9 +18,13 @@ class Game {
         document.getElementById("mineCounter").innerHTML = this.mines;
         this.timer = new Timer();
         this.generateGameboard();
+        this.generateBombs();
 
     }
 
+    /**
+     * generates fields
+     */
     generateGameboard() {
 
         var table = document.getElementById("gameboard");
@@ -24,9 +34,9 @@ class Game {
 
             for (var cols = 0; cols < this.width; cols++) {
                 var data = document.createElement("td");
-                var newField = document.createElement("img");
-                this.fields.concat(new Field(newField, rows, cols));
-                data.appendChild(newField);
+                var newElement = document.createElement("img");
+                this.fields.push(new Field(this, newElement, rows, cols));
+                data.appendChild(newElement);
                 row.appendChild(data);
             }
             table.appendChild(row);
@@ -34,22 +44,77 @@ class Game {
 
     }
 
+    /**
+     * spreads mines over the fields randomly
+     */
+    generateBombs() {
+
+        for (var mineCounter = 0; mineCounter < this.mines; mineCounter++) {
+            var field;
+            do {
+                var x = Math.floor(Math.random() * this.height);
+                var y = Math.floor(Math.random() * this.width);
+                field = this.getFieldFromPos(x,y);
+            } while(field.mine);
+            field.setAsMine();
+        }
+    }
+
+    /**
+     * search the field with the position
+     * @param x x from position
+     * @param y y from position
+     * @returns {*}
+     */
+    getFieldFromPos(x,y) {
+
+        var field;
+        for (var index in this.fields) {
+            field = this.fields[index];
+            if (field.pos.x == x && field.pos.y == y) {
+                return field;
+            }
+        }
+        return null;
+
+    }
+
+    end() {
+        //TODO: alle aufdecken
+        this.timer.stop();
+    }
+
 }
 
 class Field {
 
-    constructor(element, x, y) {
+    constructor(game, element, x, y) {
 
+        this.game = game;
         this.element = element;
         this.pos = new Pos(x, y);
         this.covered = true;
         this.mine = false;
-        this.setImage("images/field_covered.png");
+        this.setImage("images/field_blank.png");
+
+        element.addEventListener("click", function (ev) {
+            alert(this.pos.x + " " + this.pos.y);
+        });
+
+    }
+
+    uncover() {
+        this.covered = false;
 
     }
 
     setImage(path) {
         this.element.setAttribute("src", path);
+    }
+
+    setAsMine() {
+        this.mine = true;
+        this.setImage("images/mine.png");
     }
 
 }
@@ -81,8 +146,14 @@ class Timer {
         //Wird jede Sekunde ausgeführt
     }
 
-    end() {
+    stop() {
         clearInterval(this.intervalFunction);
     }
 
+}
+
+function printDebugMessage(message) {
+    var child = document.createElement("p");
+    child.innerHTML = message;
+    document.getElementById("test").appendChild(child);
 }
