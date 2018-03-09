@@ -1,3 +1,13 @@
-.gameboard {
-    background-color: lightgray;
+body {
+    font-family: Arial;
+}
+
+.header {
+    display: inline-flex;
+}
+
+.mine-counter {
+    display: inline-flex;
+
+    margin: 10pt;
 }

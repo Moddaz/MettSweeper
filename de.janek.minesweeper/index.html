@@ -4,19 +4,78 @@
     <meta charset="UTF-8">
     <title>Minesweeper</title>
     <link rel="stylesheet" href="css/main.css" type="text/css">
+    <link rel="stylesheet" href="css/game.css" type="text/css">
 </head>
 <body>
 
 <h1>Minesweeper</h1>
-<div id="gameboard" class="gameboard">
-
+<div class="header">
+    <div id="mineCounter" class="mine-counter">
+        <p>Anzahl Minen:</p>
+    </div>
+    <div>
+        <p>Zeit:</p>
+    </div>
 </div>
+<table id="gameboard" class="gameboard"/>
 
 <script type="application/ecmascript">
-    function generateGameboard() {
+    'use strict';
+
+    var fields = [];
+
+    function generateGameboard(height, width, mines) {
+
+        var table = document.getElementById("gameboard");
+
+        for (var rows = 0; rows < height; rows++) {
+            var row = document.createElement("tr");
+
+            for (var cols = 0; cols < width; cols++) {
+                var data = document.createElement("td");
+                var newField = document.createElement("img");
+                new Field(newField, rows, cols)
+                data.appendChild(newField);
+                row.appendChild(data);
+            }
+            table.appendChild(row);
+        }
 
     }
-    generateGameboard();
+
+    class Field {
+
+        constructor(element, x, y) {
+
+            this.element = element;
+            this.pos = new Pos(x, y);
+            this.covered = true;
+            this.mine = false;
+
+            element.setAttribute("src", "images/field_covered.png");
+            fields.concat(this);
+
+        }
+
+    }
+
+    class Pos {
+
+        constructor(x, y) {
+
+            this.x = x;
+            this.y = y;
+
+        }
+
+    }
+
+    function generateHeader(mines) {
+        var mineCounter = document.getElementById("mine_counter");
+    }
+
+    generateGameboard(10, 20, 20);
+
 </script>
 </body>
 </html>
