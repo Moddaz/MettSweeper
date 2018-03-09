@@ -1,0 +1,18 @@
+#header {
+    margin-left: auto;
+    margin-right: auto;
+    border-style: solid;
+    display: inline-block;
+}
+
+.info-box {
+    display: inline-flex;
+}
+
+.info-box:first-child {
+    margin-right: 30pt;
+}
+
+.info-text {
+    margin-right: 5pt;
+}

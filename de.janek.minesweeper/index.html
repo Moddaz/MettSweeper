@@ -5,40 +5,70 @@
     <title>Minesweeper</title>
     <link rel="stylesheet" href="css/main.css" type="text/css">
     <link rel="stylesheet" href="css/game.css" type="text/css">
+    <link rel="stylesheet" href="css/header.css" type="text/css">
 </head>
 <body>
 
 <h1>Minesweeper</h1>
-<div class="header">
-    <div id="mineCounter" class="mine-counter">
-        <p>Anzahl Minen:</p>
+<div id="header">
+    <div class="info-box">
+        <p class="info-text">Anzahl Minen:</p>
+        <p id="mineCounter"></p>
     </div>
-    <div>
-        <p>Zeit:</p>
+    <div class="info-box">
+        <p class="info-text">Sekunden:</p>
+        <p id="secCounter">0</p>
     </div>
 </div>
-<table id="gameboard" class="gameboard"/>
+<table id="gameboard"/>
 
 <script type="application/ecmascript">
     'use strict';
 
-    var fields = [];
+    class Game {
 
-    function generateGameboard(height, width, mines) {
+        constructor(height, width, mines) {
 
-        var table = document.getElementById("gameboard");
+            this.fields = [];
+            this.height = height;
+            this.width = width;
+            this.mines = mines;
+            this.generateGameboard();
+            this.generateHeader();
 
-        for (var rows = 0; rows < height; rows++) {
-            var row = document.createElement("tr");
+        }
 
-            for (var cols = 0; cols < width; cols++) {
-                var data = document.createElement("td");
-                var newField = document.createElement("img");
-                new Field(newField, rows, cols)
-                data.appendChild(newField);
-                row.appendChild(data);
+        generateGameboard() {
+
+            var table = document.getElementById("gameboard");
+
+            for (var rows = 0; rows < this.height; rows++) {
+                var row = document.createElement("tr");
+
+                for (var cols = 0; cols < this.width; cols++) {
+                    var data = document.createElement("td");
+                    var newField = document.createElement("img");
+                    this.fields.concat(new Field(newField, rows, cols));
+                    data.appendChild(newField);
+                    row.appendChild(data);
+                }
+                table.appendChild(row);
             }
-            table.appendChild(row);
+
+        }
+
+        generateHeader() {
+            document.getElementById("mineCounter").innerHTML = this.mines;
+            this.updateSeconds();
+        }
+
+        updateSeconds() {
+            var seconds = 0;
+            setInterval(function () {
+                seconds++;
+                document.getElementById("secCounter").innerHTML = "" + seconds;
+            }, 1000);
+            //Wird jede Sekunde ausgeführt
         }
 
     }
@@ -53,7 +83,6 @@
             this.mine = false;
 
             element.setAttribute("src", "images/field_covered.png");
-            fields.concat(this);
 
         }
 
@@ -70,11 +99,7 @@
 
     }
 
-    function generateHeader(mines) {
-        var mineCounter = document.getElementById("mine_counter");
-    }
-
-    generateGameboard(10, 20, 20);
+    var game = new Game(10,20,10);
 
 </script>
 </body>
