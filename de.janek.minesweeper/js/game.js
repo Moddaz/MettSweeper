@@ -1,5 +1,6 @@
 'use strict';
 
+
 class Game {
 
     constructor(height, width, mines) {
@@ -8,8 +9,9 @@ class Game {
         this.height = height;
         this.width = width;
         this.mines = mines;
+        document.getElementById("mineCounter").innerHTML = this.mines;
+        this.timer = new Timer();
         this.generateGameboard();
-        this.generateHeader();
 
     }
 
@@ -32,20 +34,6 @@ class Game {
 
     }
 
-    generateHeader() {
-        document.getElementById("mineCounter").innerHTML = this.mines;
-        this.updateSeconds();
-    }
-
-    updateSeconds() {
-        var seconds = 0;
-        setInterval(function () {
-            seconds++;
-            document.getElementById("secCounter").innerHTML = "" + seconds;
-        }, 1000);
-        //Wird jede Sekunde ausgeführt
-    }
-
 }
 
 class Field {
@@ -56,9 +44,12 @@ class Field {
         this.pos = new Pos(x, y);
         this.covered = true;
         this.mine = false;
+        this.setImage("images/field_covered.png");
 
-        element.setAttribute("src", "images/field_covered.png");
+    }
 
+    setImage(path) {
+        this.element.setAttribute("src", path);
     }
 
 }
@@ -70,6 +61,28 @@ class Pos {
         this.x = x;
         this.y = y;
 
+    }
+
+}
+
+class Timer {
+
+    constructor() {
+        this.intervalFunction = null;
+        this.updateSeconds();
+    }
+
+    updateSeconds() {
+        var seconds = 0;
+        this.intervalFunction = setInterval(function () {
+            seconds++;
+            document.getElementById("secCounter").innerHTML = "" + seconds;
+        }, 1000);
+        //Wird jede Sekunde ausgeführt
+    }
+
+    end() {
+        clearInterval(this.intervalFunction);
     }
 
 }
