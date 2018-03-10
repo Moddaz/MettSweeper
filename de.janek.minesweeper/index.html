@@ -23,13 +23,19 @@
 </div>
 <table id="gameboard"/>
 <p id="test">Test</p>
+<img src="images/mine.png" alt="" id="testimg"/>
 
 <script type="application/ecmascript">
     'use strict';
-    var game = new Game(10,20,30);
+    var game = new Game(10,20,50);
     document.getElementById("test").addEventListener("click", function (ev) {
-        alert("test");
+        game.computeFieldImages();
     });
+
+    /*var listener = function (ev) {
+        document.getElementById("testimg").setAttribute("src", "images/field_blank.png");
+    };
+    document.getElementById("testimg").addEventListener("click", listener);*/
 </script>
 </body>
 </html>

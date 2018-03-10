@@ -59,7 +59,7 @@ class Game {
             } while (field.mine);
             field.setAsMine();
         }
-        this.computeFieldImages();
+        //this.computeFieldImages();
 
     }
 
@@ -70,10 +70,8 @@ class Game {
 
         for (var index in this.fields) {
             var field = this.fields[index];
-
             //mine images are already set
             if (!field.mine) {
-
                 var positionsToCheck = [];
                 positionsToCheck.push(new Pos(field.pos.x, field.pos.y - 1));
                 positionsToCheck.push(new Pos(field.pos.x, field.pos.y + 1));
@@ -90,9 +88,8 @@ class Game {
                     //check if the positions are in the gameboard and if they are mines
                     if (pos.x >= 0 && pos.x < this.height
                         && pos.y >= 0 && pos.y < this.width) {
-                        var field = this.getFieldFromPos(pos.x, pos.y);
-                        //alert(field.pos.x + " " + field.pos.y);
-                        if (field.mine) numberOfMinesAround++;
+                        var fieldFromPos = this.getFieldFromPos(pos.x, pos.y);
+                        if (fieldFromPos.mine) numberOfMinesAround++;
                     }
                 }
 
@@ -127,9 +124,7 @@ class Game {
                         break;
                 }
                 field.imagePath = imagePath += ".png";
-
             }
-            field.uncover();
         }
 
     }
@@ -177,14 +172,26 @@ class Field {
         this.covered = true;
         this.mine = false;
         this.imagePath = null;
-        //TODO: später
-        //this.setImage("images/field_covered.png");
-        this.setImage("images/field_blank.png");
 
-        element.addEventListener("click", function (ev) {
-            alert(this.pos.x + " " + this.pos.y);
+        //später
+        this.setImage("images/field_covered.png");
+
+        //adding eventlisteners
+        var _this = this;
+        this.element.addEventListener("click", function (ev) {
+            if (_this.covered) {
+                _this.uncover();
+            } else {
+                ev.preventDefault();
+            }
         });
 
+    }
+
+
+    //Debug Methide
+    getPosition() {
+        return this.pos.toString();
     }
 
     /**
@@ -207,7 +214,7 @@ class Field {
      */
     setAsMine() {
         this.mine = true;
-        this.setImage("images/mine.png");
+        this.imagePath = "images/mine.png";
     }
 
 }
@@ -224,6 +231,10 @@ class Pos {
         this.x = x;
         this.y = y;
 
+    }
+
+    toString() {
+        return "(" + this.pos.x + "-" + this.pos.y + ")";
     }
 
 }
