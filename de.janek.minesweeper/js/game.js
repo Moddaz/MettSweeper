@@ -55,8 +55,8 @@ class Game {
             do {
                 var x = Math.floor(Math.random() * this.height);
                 var y = Math.floor(Math.random() * this.width);
-                field = this.getFieldFromPos(x,y);
-            } while(field.mine);
+                field = this.getFieldFromPos(x, y);
+            } while (field.mine);
             field.setAsMine();
         }
         this.computeFieldImages();
@@ -91,32 +91,43 @@ class Game {
                     if (pos.x >= 0 && pos.x < this.height
                         && pos.y >= 0 && pos.y < this.width) {
                         var field = this.getFieldFromPos(pos.x, pos.y);
-                        alert(field.pos.x + " " + field.pos.y);
+                        //alert(field.pos.x + " " + field.pos.y);
                         if (field.mine) numberOfMinesAround++;
                     }
                 }
 
+                var imagePath = "images/numbers/";
                 switch (numberOfMinesAround) {
                     case 0:
-                        field.imagePath = "images/field_blank.png";
+                        imagePath = "images/field_blank";
                         break;
                     case 1:
-                        field.imagePath = "images/one.png";
+                        imagePath += "one";
                         break;
                     case 2:
-                        field.imagePath = "images/two.png";
+                        imagePath += "two";
                         break;
                     case 3:
-                        field.imagePath = "images/three.png";
+                        imagePath += "three";
                         break;
                     case 4:
-                        field.imagePath = "images/four.png";
+                        imagePath += "four";
                         break;
-                    default:
-                        field.imagePath = "images/higher.png";
+                    case 5:
+                        imagePath += "five";
                         break;
-                    //TODO: die anderen halt noch @jonas
+                    case 6:
+                        imagePath += "six";
+                        break;
+                    case 7:
+                        imagePath += "seven";
+                        break;
+                    case 8:
+                        imagePath += "eight";
+                        break;
                 }
+                field.imagePath = imagePath += ".png";
+
             }
             field.uncover();
         }
@@ -129,7 +140,7 @@ class Game {
      * @param y vertical value
      * @returns field
      */
-    getFieldFromPos(x,y) {
+    getFieldFromPos(x, y) {
 
         var field;
         for (var index in this.fields) {
@@ -170,7 +181,7 @@ class Field {
         //this.setImage("images/field_covered.png");
         this.setImage("images/field_blank.png");
 
-        element.addEventListener("click",  function (ev) {
+        element.addEventListener("click", function (ev) {
             alert(this.pos.x + " " + this.pos.y);
         });
 
