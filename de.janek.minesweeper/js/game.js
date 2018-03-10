@@ -18,7 +18,7 @@ class Game {
         document.getElementById("mineCounter").innerHTML = this.mines;
         this.timer = new Timer();
         this.generateGameboard();
-        this.generateBombs();
+        this.generateMines();
 
     }
 
@@ -35,6 +35,7 @@ class Game {
             for (var cols = 0; cols < this.width; cols++) {
                 var data = document.createElement("td");
                 var newElement = document.createElement("img");
+                newElement.setAttribute("id", rows + "-" + cols);
                 this.fields.push(new Field(this, newElement, rows, cols));
                 data.appendChild(newElement);
                 row.appendChild(data);
@@ -47,7 +48,7 @@ class Game {
     /**
      * spreads mines over the fields randomly
      */
-    generateBombs() {
+    generateMines() {
 
         for (var mineCounter = 0; mineCounter < this.mines; mineCounter++) {
             var field;
@@ -58,13 +59,75 @@ class Game {
             } while(field.mine);
             field.setAsMine();
         }
+        this.computeFieldImages();
+
+    }
+
+    /**
+     * computes the number of mines around of each field and sets the image
+     */
+    computeFieldImages() {
+
+        for (var index in this.fields) {
+            var field = this.fields[index];
+
+            //mine images are already set
+            if (!field.mine) {
+
+                var positionsToCheck = [];
+                positionsToCheck.push(new Pos(field.pos.x, field.pos.y - 1));
+                positionsToCheck.push(new Pos(field.pos.x, field.pos.y + 1));
+                positionsToCheck.push(new Pos(field.pos.x - 1, field.pos.y));
+                positionsToCheck.push(new Pos(field.pos.x + 1, field.pos.y));
+                positionsToCheck.push(new Pos(field.pos.x + 1, field.pos.y + 1));
+                positionsToCheck.push(new Pos(field.pos.x + 1, field.pos.y - 1));
+                positionsToCheck.push(new Pos(field.pos.x - 1, field.pos.y + 1));
+                positionsToCheck.push(new Pos(field.pos.x - 1, field.pos.y - 1));
+
+                var numberOfMinesAround = 0;
+                for (var i in positionsToCheck) {
+                    var pos = positionsToCheck[i];
+                    //check if the positions are in the gameboard and if they are mines
+                    if (pos.x >= 0 && pos.x < this.height
+                        && pos.y >= 0 && pos.y < this.width) {
+                        var field = this.getFieldFromPos(pos.x, pos.y);
+                        alert(field.pos.x + " " + field.pos.y);
+                        if (field.mine) numberOfMinesAround++;
+                    }
+                }
+
+                switch (numberOfMinesAround) {
+                    case 0:
+                        field.imagePath = "images/field_blank.png";
+                        break;
+                    case 1:
+                        field.imagePath = "images/one.png";
+                        break;
+                    case 2:
+                        field.imagePath = "images/two.png";
+                        break;
+                    case 3:
+                        field.imagePath = "images/three.png";
+                        break;
+                    case 4:
+                        field.imagePath = "images/four.png";
+                        break;
+                    default:
+                        field.imagePath = "images/higher.png";
+                        break;
+                    //TODO: die anderen halt noch @jonas
+                }
+            }
+            field.uncover();
+        }
+
     }
 
     /**
      * search the field with the position
-     * @param x x from position
-     * @param y y from position
-     * @returns {*}
+     * @param x horizontal value
+     * @param y vertical value
+     * @returns field
      */
     getFieldFromPos(x,y) {
 
@@ -88,6 +151,13 @@ class Game {
 
 class Field {
 
+    /**
+     * creates new Field
+     * @param game game
+     * @param element element of HTML document
+     * @param x horizontal value
+     * @param y vertical value
+     */
     constructor(game, element, x, y) {
 
         this.game = game;
@@ -95,16 +165,25 @@ class Field {
         this.pos = new Pos(x, y);
         this.covered = true;
         this.mine = false;
+        this.imagePath = null;
+        //TODO: später
+        //this.setImage("images/field_covered.png");
         this.setImage("images/field_blank.png");
 
-        element.addEventListener("click", function (ev) {
+        element.addEventListener("click",  function (ev) {
             alert(this.pos.x + " " + this.pos.y);
         });
 
     }
 
+    /**
+     * uncovers field and call end of game if the field is a mine
+     */
     uncover() {
+
         this.covered = false;
+        this.setImage(this.imagePath);
+        //if (this.mine) this.game.end();
 
     }
 
@@ -112,6 +191,9 @@ class Field {
         this.element.setAttribute("src", path);
     }
 
+    /**
+     * sets field as a mine
+     */
     setAsMine() {
         this.mine = true;
         this.setImage("images/mine.png");
@@ -121,6 +203,11 @@ class Field {
 
 class Pos {
 
+    /**
+     * creates a new Position
+     * @param x horizontal value
+     * @param y vertical value
+     */
     constructor(x, y) {
 
         this.x = x;
@@ -132,28 +219,30 @@ class Pos {
 
 class Timer {
 
+    /**
+     * creates a new Timer
+     */
     constructor() {
         this.intervalFunction = null;
         this.updateSeconds();
     }
 
+    /**
+     * updates the timer element every second
+     */
     updateSeconds() {
         var seconds = 0;
         this.intervalFunction = setInterval(function () {
             seconds++;
             document.getElementById("secCounter").innerHTML = "" + seconds;
         }, 1000);
-        //Wird jede Sekunde ausgeführt
     }
 
+    /**
+     * stops the timer and the end of the game
+     */
     stop() {
         clearInterval(this.intervalFunction);
     }
 
-}
-
-function printDebugMessage(message) {
-    var child = document.createElement("p");
-    child.innerHTML = message;
-    document.getElementById("test").appendChild(child);
 }
