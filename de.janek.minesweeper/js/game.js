@@ -1,6 +1,5 @@
 'use strict';
 
-
 class Game {
 
     /**
@@ -15,6 +14,7 @@ class Game {
         this.height = height;
         this.width = width;
         this.mines = mines;
+        this.ingame = true;
         document.getElementById("mineCounter").innerHTML = this.mines;
         this.timer = new Timer();
         this.generateGameboard();
@@ -55,11 +55,11 @@ class Game {
             do {
                 var x = Math.floor(Math.random() * this.height);
                 var y = Math.floor(Math.random() * this.width);
-                field = this.getFieldFromPos(x, y);
-            } while (field.mine);
-            field.setAsMine();
+                field = getFieldFromPos(this, x, y);
+            } while (field.isMine());
+            field.fieldValue = FieldValueEnum.MINE;
         }
-        //this.computeFieldImages();
+        this.computeFieldImages();
 
     }
 
@@ -71,89 +71,76 @@ class Game {
         for (var index in this.fields) {
             var field = this.fields[index];
             //mine images are already set
-            if (!field.mine) {
-                var positionsToCheck = [];
-                positionsToCheck.push(new Pos(field.pos.x, field.pos.y - 1));
-                positionsToCheck.push(new Pos(field.pos.x, field.pos.y + 1));
-                positionsToCheck.push(new Pos(field.pos.x - 1, field.pos.y));
-                positionsToCheck.push(new Pos(field.pos.x + 1, field.pos.y));
-                positionsToCheck.push(new Pos(field.pos.x + 1, field.pos.y + 1));
-                positionsToCheck.push(new Pos(field.pos.x + 1, field.pos.y - 1));
-                positionsToCheck.push(new Pos(field.pos.x - 1, field.pos.y + 1));
-                positionsToCheck.push(new Pos(field.pos.x - 1, field.pos.y - 1));
-
+            if (!field.isMine()) {
+                var positionsToCheck = getSurroundingPositions(this, field);
                 var numberOfMinesAround = 0;
                 for (var i in positionsToCheck) {
                     var pos = positionsToCheck[i];
-                    //check if the positions are in the gameboard and if they are mines
-                    if (pos.x >= 0 && pos.x < this.height
-                        && pos.y >= 0 && pos.y < this.width) {
-                        var fieldFromPos = this.getFieldFromPos(pos.x, pos.y);
-                        if (fieldFromPos.mine) numberOfMinesAround++;
-                    }
+                    var fieldFromPos = getFieldFromPos(this, pos.x, pos.y);
+                    if (fieldFromPos.isMine()) numberOfMinesAround++;
                 }
 
-                var imagePath = "images/numbers/";
                 switch (numberOfMinesAround) {
                     case 0:
-                        imagePath = "images/field_blank";
+                        field.fieldValue = FieldValueEnum.BLANK;
                         break;
                     case 1:
-                        imagePath += "one";
+                        field.fieldValue = FieldValueEnum.ONE;
                         break;
                     case 2:
-                        imagePath += "two";
+                        field.fieldValue = FieldValueEnum.TWO;
                         break;
                     case 3:
-                        imagePath += "three";
+                        field.fieldValue = FieldValueEnum.THREE;
                         break;
                     case 4:
-                        imagePath += "four";
+                        field.fieldValue = FieldValueEnum.FOUR;
                         break;
                     case 5:
-                        imagePath += "five";
+                        field.fieldValue = FieldValueEnum.FIVE;
                         break;
                     case 6:
-                        imagePath += "six";
+                        field.fieldValue = FieldValueEnum.SIX;
                         break;
                     case 7:
-                        imagePath += "seven";
+                        field.fieldValue = FieldValueEnum.SEVEN;
                         break;
                     case 8:
-                        imagePath += "eight";
+                        field.fieldValue = FieldValueEnum.EIGHT;
                         break;
                 }
-                field.imagePath = imagePath += ".png";
+
+                //eigentlich bessere Lösung funktioniert aber irgendwie net
+                /*for (var enumKey in FieldValueEnum) {
+                    var enumValue = FieldValueEnum[enumKey];
+                    alert(FieldValueEnum.properties[enumValue].numberOfMinesAround + " " + numberOfMinesAround);
+                    if (FieldValueEnum.properties[enumValue].numberOfMinesAround == numberOfMinesAround) {
+                        field.fieldValue = enumKey;
+                    }
+                }*/
+                
+
             }
         }
 
     }
 
     /**
-     * search the field with the position
-     * @param x horizontal value
-     * @param y vertical value
-     * @returns field
+     * ends the game (timer stops and all mines become uncovered)
      */
-    getFieldFromPos(x, y) {
-
-        var field;
-        for (var index in this.fields) {
-            field = this.fields[index];
-            if (field.pos.x == x && field.pos.y == y) {
-                return field;
-            }
-        }
-        return null;
-
-    }
-
     end() {
-        //TODO: alle aufdecken
+
         this.timer.stop();
+        this.ingame = false;
+        for (var index in this.fields) {
+            var field = this.fields[index];
+            if (field.isMine()) field.uncover();
+        }
+
     }
 
 }
+
 
 class Field {
 
@@ -170,16 +157,13 @@ class Field {
         this.element = element;
         this.pos = new Pos(x, y);
         this.covered = true;
-        this.mine = false;
-        this.imagePath = null;
-
-        //später
+        this.fieldValue = null;
         this.setImage("images/field_covered.png");
 
         //adding eventlisteners
         var _this = this;
         this.element.addEventListener("click", function (ev) {
-            if (_this.covered) {
+            if (_this.covered && _this.game.ingame) {
                 _this.uncover();
             } else {
                 ev.preventDefault();
@@ -188,20 +172,30 @@ class Field {
 
     }
 
-
-    //Debug Methide
-    getPosition() {
-        return this.pos.toString();
-    }
-
     /**
-     * uncovers field and call end of game if the field is a mine
+     * uncovers field and blank fields around
+     * call end of game if the field is a mine
      */
     uncover() {
 
         this.covered = false;
-        this.setImage(this.imagePath);
-        //if (this.mine) this.game.end();
+        this.setImage(FieldValueEnum.properties[this.fieldValue].imgpath);
+        if (this.isMine() && this.game.ingame) this.game.end();
+        if (this.isBlank()) this.uncoverNeighbours();
+
+    }
+
+    /**
+     * uncovers all neighbours which are not mines
+     */
+    uncoverNeighbours() {
+
+       /* var surroundingPositions = getSurroundingPositions(this.game, this);
+        var surroundungFields = [];
+        for (var index in surroundingPositions) {
+            var surroundingPosition = surroundingPositions[index];
+            surroundungFields.push(getFieldFromPos(this.game, surroundingPosition.x, surroundingPosition.y))
+        }*/
 
     }
 
@@ -209,13 +203,92 @@ class Field {
         this.element.setAttribute("src", path);
     }
 
-    /**
-     * sets field as a mine
-     */
-    setAsMine() {
-        this.mine = true;
-        this.imagePath = "images/mine.png";
+
+    isMine() {
+        return this.fieldValue == FieldValueEnum.MINE;
     }
+
+    isBlank() {
+        return this.fieldValue == FieldValueEnum.BLANK;
+    }
+
+}
+
+var FieldValueEnum = {
+
+    BLANK: 0,
+    ONE: 1,
+    TWO: 2,
+    THREE: 3,
+    FOUR: 4,
+    FIVE: 5,
+    SIX: 6,
+    SEVEN: 7,
+    EIGHT: 8,
+    MINE: 9,
+
+    properties: {
+        0: {numberOfMinesAround: 0, imgpath: "images/field_blank.png"},
+        1: {numberOfMinesAround: 1, imgpath: "images/numbers/one.png"},
+        2: {numberOfMinesAround: 2, imgpath: "images/numbers/two.png"},
+        3: {numberOfMinesAround: 3, imgpath: "images/numbers/three.png"},
+        4: {numberOfMinesAround: 4, imgpath: "images/numbers/four.png"},
+        5: {numberOfMinesAround: 5, imgpath: "images/numbers/five.png"},
+        6: {numberOfMinesAround: 6, imgpath: "images/numbers/six.png"},
+        7: {numberOfMinesAround: 7, imgpath: "images/numbers/seven.png"},
+        8: {numberOfMinesAround: 8, imgpath: "images/numbers/eight.png"},
+        9: {numberOfMinesAround: -1, imgpath: "images/mine.png"},
+    }
+};
+
+/**
+ * returns an array with all surrounding positions of a field
+ * @param game game
+ * @param field field
+ * @returns {Array}
+ */
+function getSurroundingPositions(game, field) {
+
+    var positionsToCheck = [];
+    positionsToCheck.push(new Pos(field.pos.x, field.pos.y - 1));
+    positionsToCheck.push(new Pos(field.pos.x, field.pos.y + 1));
+    positionsToCheck.push(new Pos(field.pos.x - 1, field.pos.y));
+    positionsToCheck.push(new Pos(field.pos.x + 1, field.pos.y));
+    positionsToCheck.push(new Pos(field.pos.x + 1, field.pos.y + 1));
+    positionsToCheck.push(new Pos(field.pos.x + 1, field.pos.y - 1));
+    positionsToCheck.push(new Pos(field.pos.x - 1, field.pos.y + 1));
+    positionsToCheck.push(new Pos(field.pos.x - 1, field.pos.y - 1));
+
+    var surroundingPositionsInGameboard = [];
+    for (var index in positionsToCheck) {
+        var pos = positionsToCheck[index];
+        //check if the positions are in the gameboard and if they are mines
+        if (pos.x >= 0 && pos.x < game.height
+            && pos.y >= 0 && pos.y < game.width) {
+            surroundingPositionsInGameboard.push(pos);
+        }
+    }
+    return surroundingPositionsInGameboard;
+
+}
+
+/**
+ * search the field with the position
+ * @param game Game
+ * @param x horizontal value
+ * @param y vertical value
+ * @returns field
+ */
+function getFieldFromPos(game, x, y) {
+
+    var field;
+    for (var index in game.fields) {
+        field = game.fields[index];
+        if (field.pos.x == x && field.pos.y == y) {
+            return field;
+        }
+    }
+    return null;
 
 }
 
