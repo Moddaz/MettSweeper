@@ -1,0 +1,22 @@
+#settingsOutBox {
+    position: absolute;
+    left: 50%;
+}
+
+#settingsBox {
+    display: none;
+    position: relative;
+    left: -50%;
+    z-index: 1;
+    width: 200pt;
+    height: 100pt;
+
+    background-color: lightgray;
+
+    font-weight: bold;
+}
+
+#settingsHeader {
+    background-color: gray;
+    display: inline-flex;
+}

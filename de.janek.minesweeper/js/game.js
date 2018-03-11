@@ -21,10 +21,6 @@ class Game {
         this.generateGameboard();
         this.generateMines();
 
-        //clears win/lose text from former game
-        document.getElementById("loseText").style.display = "none";
-        document.getElementById("winText").style.display = "none";
-
     }
 
     /**
@@ -163,10 +159,8 @@ class Game {
                 var field = this.fields[index];
                 if (field.isMine()) field.uncover();
             }
-            document.getElementById("loseText").style.display = "block";
-        } else {
-            document.getElementById("winText").style.display = "block";
         }
+        document.getElementById(win ? "winText" : "loseText").style.display = "block";
 
     }
 
@@ -213,7 +207,7 @@ class Field {
                     }
                     break;
                 case 3:
-                    if (_this.game.ingame) {
+                    if (_this.game.ingame && _this.covered) {
                         if (_this.marked) _this.unmark();
                         else _this.mark();
                     }
