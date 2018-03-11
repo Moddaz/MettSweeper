@@ -12,30 +12,32 @@
 
 <h1>Minesweeper</h1>
 <div id="header">
-    <div class="info-box">
+    <div class="header-module">
         <p class="info-text">Anzahl Minen:</p>
         <p id="mineCounter"></p>
     </div>
-    <div class="info-box">
+    <div class="header-module">
         <p class="info-text">Sekunden:</p>
         <p id="secCounter">0</p>
     </div>
+    <div class="header-module">
+        <p id="winText" class="endText">Gewonnen!</p>
+    </div>
+    <div class="header-module">
+        <p id="loseText" class="endText">Verloren!</p>
+    </div>
 </div>
-<table id="gameboard"/>
-<p id="test">Test</p>
-<img src="images/mine.png" alt="" id="testimg"/>
+
+<br/>
+<br/>
+<br/>
+<br/>
+<table id="gameboard" oncontextmenu="return false;"/>
 
 <script type="application/ecmascript">
     'use strict';
-    var game = new Game(10,20,20);
-    /*document.getElementById("test").addEventListener("click", function (ev) {
-        game.computeFieldImages();
-    });*/
-
-    /*var listener = function (ev) {
-        document.getElementById("testimg").setAttribute("src", "images/field_blank.png");
-    };
-    document.getElementById("testimg").addEventListener("click", listener);*/
+    var game = new Game(10,20,5);
 </script>
+
 </body>
 </html>

@@ -14,11 +14,16 @@ class Game {
         this.height = height;
         this.width = width;
         this.mines = mines;
+        this.remainingMines = mines;
         this.ingame = true;
-        document.getElementById("mineCounter").innerHTML = this.mines;
+        document.getElementById("mineCounter").innerHTML = this.remainingMines;
         this.timer = new Timer();
         this.generateGameboard();
         this.generateMines();
+
+        //clears win/lose text from former game
+        document.getElementById("loseText").style.display = "none";
+        document.getElementById("winText").style.display = "none";
 
     }
 
@@ -126,17 +131,50 @@ class Game {
     }
 
     /**
+     * checks if all mines are marked with a flag
+     * @returns {boolean}
+     */
+    checkWin() {
+
+        var normalFields = [];
+        for (var fieldIndex in this.fields) {
+            var field = this.fields[fieldIndex];
+            if (field.fieldValue != FieldValueEnum.MINE) normalFields.push(field);
+        }
+        for (var normalFieldIndex in normalFields) {
+            var normalField = normalFields[normalFieldIndex];
+            if (normalField.covered) return false;
+        }
+        return true;
+
+    }
+
+    /**
      * ends the game (timer stops and all mines become uncovered)
      */
-    end() {
+    end(win) {
 
         this.timer.stop();
         this.ingame = false;
-        for (var index in this.fields) {
-            var field = this.fields[index];
-            if (field.isMine()) field.uncover();
+
+        if (!win) {
+            //uncovers all mines
+            for (var index in this.fields) {
+                var field = this.fields[index];
+                if (field.isMine()) field.uncover();
+            }
+            document.getElementById("loseText").style.display = "block";
+        } else {
+            document.getElementById("winText").style.display = "block";
         }
 
+    }
+
+    /**
+     * updates mine counter
+     */
+    updateRemainingMineCounter() {
+        document.getElementById("mineCounter").innerHTML = this.remainingMines;
     }
 
 }
@@ -157,18 +195,33 @@ class Field {
         this.element = element;
         this.pos = new Pos(x, y);
         this.covered = true;
+        this.marked = false;
         this.fieldValue = null;
         this.setImage("images/field_covered.png");
 
         //adding eventlisteners
         var _this = this;
-        this.element.addEventListener("click", function (ev) {
-            if (_this.covered && _this.game.ingame) {
-                _this.uncover();
-            } else {
-                ev.preventDefault();
+        this.element.onmousedown = function (ev) {
+            switch (ev.which) {
+                case 1:
+                    if (_this.covered && !_this.marked && _this.game.ingame) {
+                        _this.uncover();
+                        //alert(_this.game.checkWin());
+                        if (_this.game.checkWin()) _this.game.end(true);
+                    } else {
+                        ev.preventDefault();
+                    }
+                    break;
+                case 3:
+                    if (_this.game.ingame) {
+                        if (_this.marked) _this.unmark();
+                        else _this.mark();
+                    }
+                    ev.preventDefault();
+                    break;
             }
-        });
+
+        };
 
     }
 
@@ -202,10 +255,33 @@ class Field {
         }
     }
 
+    /**
+     * marks field with a flag
+     */
+    mark() {
+
+        this.marked = true;
+        this.setImage("images/flag.png")
+        this.game.remainingMines--;
+        this.game.updateRemainingMineCounter();
+
+    }
+
+    /**
+     * removes flag
+     */
+    unmark() {
+
+        this.marked = false;
+        this.setImage("images/field_covered.png");
+        this.game.remainingMines++;
+        this.game.updateRemainingMineCounter();
+
+    }
+
     setImage(path) {
         this.element.setAttribute("src", path);
     }
-
 
     isMine() {
         return this.fieldValue == FieldValueEnum.MINE;
@@ -213,10 +289,6 @@ class Field {
 
     isBlank() {
         return this.fieldValue == FieldValueEnum.BLANK;
-    }
-
-    isNumber() {
-        return !this.isMine() && !this.isBlank();
     }
 
 }

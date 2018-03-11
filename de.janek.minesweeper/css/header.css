@@ -5,14 +5,26 @@
     display: inline-block;
 }
 
-.info-box {
+.header-module {
     display: inline-flex;
-}
-
-.info-box:first-child {
-    margin-right: 30pt;
+    margin-right: 10pt;
+    margin-left: 10pt;
 }
 
 .info-text {
     margin-right: 5pt;
+}
+
+.endText {
+    font-size: 20pt;
+    font-weight: bold;
+    display: none;
+}
+
+#winText {
+    color: green;
+}
+
+#loseText {
+    color: red;
 }
