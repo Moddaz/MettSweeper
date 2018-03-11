@@ -154,10 +154,11 @@ class Game {
         this.ingame = false;
 
         if (!win) {
-            //uncovers all mines
+            //uncovers all mines#
+            //TODO: falsch gesetzte Flaggen beim Aufdecken anzeigen http://www.metrixx7.de/m/20723.png
             for (var index in this.fields) {
                 var field = this.fields[index];
-                if (field.isMine()) field.uncover();
+                if (field.isMine()) field.uncover(false);
             }
         }
         document.getElementById(win ? "winText" : "loseText").style.display = "block";
@@ -199,7 +200,7 @@ class Field {
             switch (ev.which) {
                 case 1:
                     if (_this.covered && !_this.marked && _this.game.ingame) {
-                        _this.uncover();
+                        _this.uncover(_this.isBlank());
                         //alert(_this.game.checkWin());
                         if (_this.game.checkWin()) _this.game.end(true);
                     } else {
@@ -223,12 +224,12 @@ class Field {
      * uncovers field and blank fields around
      * call end of game if the field is a mine
      */
-    uncover() {
+    uncover(uncoverNeighbours) {
 
         this.covered = false;
         this.setImage(FieldValueEnum.properties[this.fieldValue].imgpath);
         if (this.isMine() && this.game.ingame) this.game.end();
-        if (this.isBlank()) this.uncoverNeighbours();
+        if (uncoverNeighbours) this.uncoverNeighbours();
 
     }
 
@@ -245,7 +246,7 @@ class Field {
         }
         for (var indexFields in surroundungFields) {
             var surroundingField = surroundungFields[indexFields];
-            if (!surroundingField.isMine() && surroundingField.covered) surroundingField.uncover();
+            if (!surroundingField.isMine() && surroundingField.covered) surroundingField.uncover(surroundingField.isBlank());
         }
     }
 
