@@ -15,17 +15,55 @@
 
 <button id="settingsButton">Settings</button>
 <br/>
-<div id="settingsOutBox">
-    <div id="settingsBox">
-        <div id="settingsHeader">
+<div class="settingsOutBox" id="settingsOutBox">
+    <div class="settingsBox">
+        <div class="settingsHeader">
             <p>Settings</p>
             <p id="closeSettings">X</p>
         </div>
+        <br/>
+        <p>Einstellungen</p>
+        <form action="">
+            <table>
+                <tr>
+                    <td>
+                        <label for="beginner">Anfänger</label>
+                        <input type="radio" id="beginner" name="mode"/>
+                    </td>
+                    <td>
+                        <label for="widthInput">Breite</label>
+                        <input id="widthInput" type="number" value="0"/>
+                        <br/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="intermediate">Fortgeschritten</label>
+                        <input type="radio" id="intermediate" name="mode"/>
+                    </td>
+                    <td>
+                        <label for="heightInput">Höhe</label>
+                        <input id="heightInput" type="number"/>
+                        <br/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="expert">Bo$$</label>
+                        <input type="radio" id="expert" name="mode" checked="checked"/>
+                    </td>
+                    <td>
+                        <label for="mineInput">Minen</label>
+                        <input id="mineInput" type="number"/>
+                        <br/>
+                    </td>
+                </tr>
+            </table>
+        </form>
     </div>
 </div>
-
 <br/>
-<button id="startNewGameButton" >Neues Spiel</button>
+<button id="startNewGameButton">Neues Spiel</button>
 <br/>
 <br/>
 
@@ -54,19 +92,57 @@
 
 <script type="application/ecmascript">
     'use strict';
-    //import {newGameButtonClick, settingsButtonClick} from "./js/functions";
 
-    var settingsButtonClick = function(ev) {
-        document.getElementById("settingsBox").style.display = "block";
+    //settings stuff
+    document.getElementById("settingsButton").addEventListener("click", function (ev) {
+        document.getElementById("settingsOutBox").style.display = "block";
+    });
+
+    document.getElementById("closeSettings").addEventListener("click", function (ev) {
+        document.getElementById("settingsOutBox").style.display = "none";
+    });
+
+    var beginnerRadioButton = document.getElementById("beginner");
+    var intermediateRadioButton = document.getElementById("intermediate");
+    var expertRadioButton = document.getElementById("expert");
+
+    var changeTemplate = function (ev) {
+
+        var widthValue;
+        var heightValue;
+        var mineValue;
+
+        if (beginnerRadioButton.checked) {
+            widthValue = 9;
+            heightValue = 9;
+            mineValue = 10;
+        } else if (intermediateRadioButton.checked) {
+            widthValue = 16;
+            heightValue = 16;
+            mineValue = 40;
+        } else if (expertRadioButton.checked) {
+            widthValue = 16;
+            heightValue = 30;
+            mineValue = 99;
+        }
+
+        document.getElementById("widthInput").setAttribute("value", widthValue);
+        document.getElementById("heightInput").setAttribute("value", heightValue);
+        document.getElementById("mineInput").setAttribute("value", mineValue);
+
     };
 
+    beginnerRadioButton.addEventListener("change", changeTemplate);
+    intermediateRadioButton.addEventListener("change", changeTemplate);
+    expertRadioButton.addEventListener("change", changeTemplate);
+
+
+
+    //new game stuff
     var game;
-    var newGameButtonClick = function(ev) {
-        game = new Game(10,20,30);
-    };
-
-    document.getElementById("settingsButton").addEventListener("click", settingsButtonClick);
-    document.getElementById("startNewGameButton").addEventListener("click", newGameButtonClick);
+    document.getElementById("startNewGameButton").addEventListener("click", function (ev) {
+        game = new Game(10, 20, 30);
+    });
 </script>
 
 </body>

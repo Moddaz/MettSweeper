@@ -1,22 +1,29 @@
-#settingsOutBox {
+.settingsOutBox {
     position: absolute;
     left: 50%;
+    display: none;
 }
 
-#settingsBox {
-    display: none;
+.settingsBox {
     position: relative;
     left: -50%;
     z-index: 1;
-    width: 200pt;
-    height: 100pt;
-
+    width: 300pt;
+    height: 150pt;
     background-color: lightgray;
-
     font-weight: bold;
 }
 
-#settingsHeader {
+.settingsHeader {
     background-color: gray;
     display: inline-flex;
 }
+
+
+.templateBox {
+    display: inline-flex;
+}
+
+
+
+
