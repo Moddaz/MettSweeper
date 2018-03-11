@@ -118,7 +118,7 @@ class Game {
                         field.fieldValue = enumKey;
                     }
                 }*/
-                
+
 
             }
         }
@@ -190,13 +190,16 @@ class Field {
      */
     uncoverNeighbours() {
 
-       /* var surroundingPositions = getSurroundingPositions(this.game, this);
+        var surroundingPositions = getSurroundingPositions(this.game, this);
         var surroundungFields = [];
-        for (var index in surroundingPositions) {
-            var surroundingPosition = surroundingPositions[index];
+        for (var indexPosition in surroundingPositions) {
+            var surroundingPosition = surroundingPositions[indexPosition];
             surroundungFields.push(getFieldFromPos(this.game, surroundingPosition.x, surroundingPosition.y))
-        }*/
-
+        }
+        for (var indexFields in surroundungFields) {
+            var surroundingField = surroundungFields[indexFields];
+            if (!surroundingField.isMine() && surroundingField.covered) surroundingField.uncover();
+        }
     }
 
     setImage(path) {
@@ -210,6 +213,10 @@ class Field {
 
     isBlank() {
         return this.fieldValue == FieldValueEnum.BLANK;
+    }
+
+    isNumber() {
+        return !this.isMine() && !this.isBlank();
     }
 
 }
