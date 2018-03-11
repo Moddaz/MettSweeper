@@ -1,13 +1,14 @@
+/*
 
 export { getFieldFromPos, getSurroundingPositions};
 import { Pos } from "game";
 
-/**
+/!**
  * returns an array with all surrounding positions of a field
  * @param game game
  * @param field field
  * @returns {Array}
- */
+ *!/
 function getSurroundingPositions(game, field) {
 
     var positionsToCheck = [];
@@ -33,18 +34,18 @@ function getSurroundingPositions(game, field) {
 
 }
 
-/**
+/!**
  * search the field with the position
  * @param game Game
  * @param x horizontal value
  * @param y vertical value
  * @returns field
- */
+ *!/
 function getFieldFromPos(game, x, y) {
 
     var field;
     for (var index in game.fields) {
-        field = this.fields[index];
+        field = game.fields[index];
         if (field.pos.x == x && field.pos.y == y) {
             return field;
         }
@@ -52,3 +53,4 @@ function getFieldFromPos(game, x, y) {
     return null;
 
 }
+*/
