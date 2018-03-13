@@ -192,7 +192,7 @@ class Field {
         this.covered = true;
         this.marked = false;
         this.fieldValue = null;
-        this.setImage("../images/field_covered.png");
+        this.setImage("images/field_covered.png");
 
         //adding eventlisteners
         var _this = this;
@@ -257,7 +257,7 @@ class Field {
     mark() {
 
         this.marked = true;
-        this.setImage("../images/flag.png")
+        this.setImage("images/flag.png")
         this.game.remainingMines--;
         this.game.updateRemainingMineCounter();
 
@@ -269,7 +269,7 @@ class Field {
     unmark() {
 
         this.marked = false;
-        this.setImage("../images/field_covered.png");
+        this.setImage("images/field_covered.png");
         this.game.remainingMines++;
         this.game.updateRemainingMineCounter();
 
@@ -354,16 +354,16 @@ var FieldValueEnum = {
     MINE: 9,
 
     properties: {
-        0: {numberOfMinesAround: 0, imgpath: "../images/field_blank.png"},
-        1: {numberOfMinesAround: 1, imgpath: "../images/numbers/one.png"},
-        2: {numberOfMinesAround: 2, imgpath: "../images/numbers/two.png"},
-        3: {numberOfMinesAround: 3, imgpath: "../images/numbers/three.png"},
-        4: {numberOfMinesAround: 4, imgpath: "../images/numbers/four.png"},
-        5: {numberOfMinesAround: 5, imgpath: "../images/numbers/five.png"},
-        6: {numberOfMinesAround: 6, imgpath: "../images/numbers/six.png"},
-        7: {numberOfMinesAround: 7, imgpath: "../images/numbers/seven.png"},
-        8: {numberOfMinesAround: 8, imgpath: "../images/numbers/eight.png"},
-        9: {numberOfMinesAround: -1, imgpath: "../images/mine.png"},
+        0: {numberOfMinesAround: 0, imgpath: "images/field_blank.png"},
+        1: {numberOfMinesAround: 1, imgpath: "images/numbers/one.png"},
+        2: {numberOfMinesAround: 2, imgpath: "images/numbers/two.png"},
+        3: {numberOfMinesAround: 3, imgpath: "images/numbers/three.png"},
+        4: {numberOfMinesAround: 4, imgpath: "images/numbers/four.png"},
+        5: {numberOfMinesAround: 5, imgpath: "images/numbers/five.png"},
+        6: {numberOfMinesAround: 6, imgpath: "images/numbers/six.png"},
+        7: {numberOfMinesAround: 7, imgpath: "images/numbers/seven.png"},
+        8: {numberOfMinesAround: 8, imgpath: "images/numbers/eight.png"},
+        9: {numberOfMinesAround: -1, imgpath: "images/mine.png"},
     }
 };
 
